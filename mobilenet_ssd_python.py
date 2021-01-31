@@ -1,21 +1,17 @@
 #Import the neccesary libraries
+from imutils.video import FPS
 import numpy as np
 import argparse
+import imutils
 import cv2 
 
 # construct the argument parse 
-parser = argparse.ArgumentParser(
-    description='Script to run MobileNet-SSD object detection network ')
+parser = argparse.ArgumentParser(description='Script to run MobileNet-SSD object detection network ')
 parser.add_argument("--video", help="path to video file. If empty, camera's stream will be used")
-parser.add_argument("--prototxt", default="MobileNetSSD_deploy.prototxt",
-                                  help='Path to text network file: '
-                                       'MobileNetSSD_deploy.prototxt for Caffe model or '
-                                       )
-parser.add_argument("--weights", default="MobileNetSSD_deploy.caffemodel",
-                                 help='Path to weights: '
-                                      'MobileNetSSD_deploy.caffemodel for Caffe model or '
-                                      )
+parser.add_argument("--prototxt", default="MobileNetSSD_deploy.prototxt", help='Path to text network file:')
+parser.add_argument("--weights", default="MobileNetSSD_deploy.caffemodel", help='Path to weights')
 parser.add_argument("--thr", default=0.2, type=float, help="confidence threshold to filter out weak detections")
+parser.add_argument("--use-gpu", type=bool, default=True,help="boolean indicating if CUDA GPU should be used")
 args = parser.parse_args()
 
 # Labels of Network.
@@ -34,10 +30,29 @@ else:
 
 #Load the Caffe model 
 net = cv2.dnn.readNetFromCaffe(args.prototxt, args.weights)
+if args.use_gpu:
+	# set CUDA as the preferable backend and target
+	print("[INFO] setting preferable backend and target to CUDA...")
+	net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+	net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
+frame_no = 0
+fps = FPS().start()
 while True:
     # Capture frame-by-frame
-    ret, frame = cap.read()
+    return_value, frame = cap.read()
+    if return_value:
+        frame_no += 1
+    else:
+        if frame_no == cap.get(cv2.CAP_PROP_FRAME_COUNT):
+          print("Video processing complete")
+          break
+        raise ValueError("No image! Try with another video format")
+    
+    if frame_no == 1:
+      fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+      writer = cv2.VideoWriter('output.avi', fourcc, 30, (frame.shape[1], frame.shape[0]), True)
+    
     frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
 
     # MobileNet requires fixed dimensions for input image(s)
@@ -94,9 +109,12 @@ while True:
                 cv2.putText(frame, label, (xLeftBottom, yLeftBottom),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
-                print(label) #print class and confidence
+                #print(label) #print class and confidence
 
-    cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
-    cv2.imshow("frame", frame)
-    if cv2.waitKey(1) >= 0:  # Break with ESC 
-        break
+    writer.write(frame)
+    fps.update()
+    #if cv2.waitKey(1) >= 0:  # Break with ESC 
+        #break
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
