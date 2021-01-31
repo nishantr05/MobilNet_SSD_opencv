@@ -106,7 +106,7 @@ for i in range(detections.shape[2]):
                                  (255, 255, 255), cv2.FILLED)
             cv2.putText(frame, label, (xLeftBottom_, yLeftBottom_),
                         cv2.FONT_HERSHEY_TRIPLEX, 0.8, (0, 0, 0))
-            print label #print class and confidence 
+            #print(label) #print class and confidence 
 cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
 cv2.imshow("frame", frame)
 cv2.waitKey(0)
