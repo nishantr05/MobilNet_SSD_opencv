@@ -28,6 +28,8 @@ classNames = { 0: 'background',
 
 #Load the Caffe model 
 net = cv2.dnn.readNetFromCaffe(args.prototxt, args.weights)
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 # Load image fro
 frame = cv2.imread(args.image)
 frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
@@ -107,7 +109,4 @@ for i in range(detections.shape[2]):
             cv2.putText(frame, label, (xLeftBottom_, yLeftBottom_),
                         cv2.FONT_HERSHEY_TRIPLEX, 0.8, (0, 0, 0))
             #print(label) #print class and confidence 
-cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
-cv2.imshow("frame", frame)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.imwrite('pred.jpg', frame)
