@@ -39,6 +39,7 @@ if args.use_gpu:
 
 frame_no = 0
 fps = FPS().start()
+print("Processing the video...")
 while True:
     # Capture frame-by-frame
     return_value, frame = cap.read()
@@ -117,9 +118,16 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
             
             if people_count == 0:
-              
-
-                #print(label) #print class and confidence
+                cv2.putText(image, "WARNING!No person in frame!", (5, 15),
+                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (200, 0, 0), 1)
+            elif people_count > 1:
+                cv2.putText(image, "WARNING!Multiple people in frame!", (5, 15),
+                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (200, 0, 0), 1)
+                cv2.putText(image, "People detected = {}".format(people_count), (5, 22),
+                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (200, 0, 0), 1)
+            else:
+                cv2.putText(image, "People detected = {}".format(people_count), (5, 15),
+                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 200, 0), 1)
 
     writer.write(frame)
     fps.update()
