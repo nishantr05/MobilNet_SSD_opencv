@@ -11,7 +11,8 @@ parser.add_argument("--video", help="path to video file. If empty, camera's stre
 parser.add_argument("--prototxt", default="MobileNetSSD_deploy.prototxt", help='Path to text network file:')
 parser.add_argument("--weights", default="MobileNetSSD_deploy.caffemodel", help='Path to weights')
 parser.add_argument("--thr", default=0.2, type=float, help="confidence threshold to filter out weak detections")
-parser.add_argument("--use-gpu", type=bool, default=True,help="boolean indicating if CUDA GPU should be used")
+#parser.add_argument("--use-gpu", type=bool, default=True,help="boolean indicating if CUDA GPU should be used")
+parser.add_argument("--output", default="./detections/output.avi", type=str, help="Outout path to save file")
 args = parser.parse_args()
 
 # Labels of Network.
@@ -51,7 +52,7 @@ while True:
     
     if frame_no == 1:
       fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-      writer = cv2.VideoWriter('output.avi', fourcc, 30, (frame.shape[1], frame.shape[0]), True)
+      writer = cv2.VideoWriter(args.output, fourcc, 30, (frame.shape[1], frame.shape[0]), True)
     
     frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
 
@@ -74,10 +75,16 @@ while True:
     #For get the class and location of object detected, 
     # There is a fix index for class, location and confidence
     # value in @detections array .
+    people_count = 0
     for i in range(detections.shape[2]):
         confidence = detections[0, 0, i, 2] #Confidence of prediction 
         if confidence > args.thr: # Filter prediction 
             class_id = int(detections[0, 0, i, 1]) # Class label
+
+            if class_id == 15:
+              people_count += 1
+            else:
+              continue    #ignore other detections
 
             # Object location 
             xLeftBottom = int(detections[0, 0, i, 3] * cols) 
@@ -95,7 +102,7 @@ while True:
             yRightTop   = int(heightFactor * yRightTop)
             # Draw location of object  
             cv2.rectangle(frame, (xLeftBottom, yLeftBottom), (xRightTop, yRightTop),
-                          (0, 255, 0))
+                          (0, 0, 200),2)
 
             # Draw label and confidence of prediction in frame resized
             if class_id in classNames:
@@ -105,9 +112,12 @@ while True:
                 yLeftBottom = max(yLeftBottom, labelSize[1])
                 cv2.rectangle(frame, (xLeftBottom, yLeftBottom - labelSize[1]),
                                      (xLeftBottom + labelSize[0], yLeftBottom + baseLine),
-                                     (255, 255, 255), cv2.FILLED)
+                                     (0, 0, 200), cv2.FILLED)
                 cv2.putText(frame, label, (xLeftBottom, yLeftBottom),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
+            
+            if people_count == 0:
+              
 
                 #print(label) #print class and confidence
 
