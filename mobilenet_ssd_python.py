@@ -10,8 +10,8 @@ parser = argparse.ArgumentParser(description='Script to run MobileNet-SSD object
 parser.add_argument("--video", help="path to video file. If empty, camera's stream will be used")
 parser.add_argument("--prototxt", default="MobileNetSSD_deploy.prototxt", help='Path to text network file:')
 parser.add_argument("--weights", default="MobileNetSSD_deploy.caffemodel", help='Path to weights')
-parser.add_argument("--thr", default=0.2, type=float, help="confidence threshold to filter out weak detections")
-#parser.add_argument("--use-gpu", type=bool, default=True,help="boolean indicating if CUDA GPU should be used")
+parser.add_argument("--thr", default=0.3, type=float, help="confidence threshold to filter out weak detections")
+parser.add_argument("--use-gpu", type=bool, default=True,help="boolean indicating if CUDA GPU should be used")
 parser.add_argument("--output", default="./detections/output.avi", type=str, help="Outout path to save file")
 args = parser.parse_args()
 
@@ -103,7 +103,7 @@ while True:
             yRightTop   = int(heightFactor * yRightTop)
             # Draw location of object  
             cv2.rectangle(frame, (xLeftBottom, yLeftBottom), (xRightTop, yRightTop),
-                          (0, 0, 200),2)
+                          (200, 0, 0),2)
 
             # Draw label and confidence of prediction in frame resized
             if class_id in classNames:
@@ -113,21 +113,21 @@ while True:
                 yLeftBottom = max(yLeftBottom, labelSize[1])
                 cv2.rectangle(frame, (xLeftBottom, yLeftBottom - labelSize[1]),
                                      (xLeftBottom + labelSize[0], yLeftBottom + baseLine),
-                                     (0, 0, 200), cv2.FILLED)
+                                     (200, 0, 0), cv2.FILLED)
                 cv2.putText(frame, label, (xLeftBottom, yLeftBottom),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
             
-            if people_count == 0:
-                cv2.putText(image, "WARNING!No person in frame!", (5, 15),
-                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (200, 0, 0), 1)
-            elif people_count > 1:
-                cv2.putText(image, "WARNING!Multiple people in frame!", (5, 15),
-                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (200, 0, 0), 1)
-                cv2.putText(image, "People detected = {}".format(people_count), (5, 22),
-                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (200, 0, 0), 1)
-            else:
-                cv2.putText(image, "People detected = {}".format(people_count), (5, 15),
-                            cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 200, 0), 1)
+    if people_count == 0:
+        cv2.putText(frame, "WARNING!No person in frame!", (5, 15),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 0, 200), 1)
+    elif people_count > 1:
+        cv2.putText(frame, "WARNING!Multiple people in frame!", (5, 15),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 0, 200), 1)
+        cv2.putText(frame, "People detected = {}".format(people_count), (5, 42),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 0, 200), 1)
+    else:
+        cv2.putText(frame, "People detected = {}".format(people_count), (5, 15),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 200, 0), 1)
 
     writer.write(frame)
     fps.update()
