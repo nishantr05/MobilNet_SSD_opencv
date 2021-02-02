@@ -1,22 +1,20 @@
 # MobilNet_SSD_opencv
-MobilNet-SSD object detection in opencv 3.4.1 and python 3 or 2
+MobilNet-SSD based object detection person counting.
+Need opencv 4.2 or higher (for effecient GPU use) and python 3.
 
-Read tutorial here:
-http://ebenezertechs.com/mobilenet-ssd-using-opencv-3-4-1-deep-learning-module-python/
+```count_vid.py```: 
+Counts number of people detected in video.
 
-```Mobilenet_ssd_python.py```: 
-Example take video file or videocamera as input. 
-
-```sample_img.py```: 
-Take a image as input. If don't load an image by default load img.jpeg 
+```count_img.py```: 
+Counts number of people detected in video. 
 
 ## Run scripts
 ```sh
-$ python3 mobilenet_ssd_python.py --[params] 
+$ python3 count_vid.py --[params] 
 ```
-If no load params take video input value by default 
+If no params, takes  default video as input.
 
 ```sh
-$ python3 sample_img.py --[params] 
+$ python3 count_img.py --[params] 
 ```
 If no load params take Image by default 
