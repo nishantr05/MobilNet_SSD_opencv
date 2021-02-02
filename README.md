@@ -1,5 +1,5 @@
 # MobilNet_SSD_opencv
-MobilNet-SSD based object detection person counting.
+MobilNet-SSD based object detection for person counting.
 Need opencv 4.2 or higher (for effecient GPU use) and python 3.
 
 ```count_vid.py```: 
